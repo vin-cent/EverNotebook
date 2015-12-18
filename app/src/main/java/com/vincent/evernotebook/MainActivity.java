@@ -11,18 +11,33 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.login.EvernoteLoginFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
+
+    private EvernoteSession mSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (!ensureLoggedIn()) {
-            finish();
-            return;
+            mSession.authenticate(this);
+        } else {
+            initUI();
         }
+    }
 
+    @Override
+    public void onLoginFinished(boolean successful) {
+        if (successful) {
+            initUI();
+        } else {
+            finish();
+        }
+    }
+
+    private void initUI() {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -38,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean ensureLoggedIn() {
-        EvernoteSession session = EvernoteSession.getInstance();
-        boolean loggedIn = session.isLoggedIn();
+        mSession = EvernoteSession.getInstance();
+        boolean loggedIn = mSession.isLoggedIn();
 
         if (!loggedIn) {
             Toast.makeText(this, "Not logged in", Toast.LENGTH_LONG).show();
@@ -69,4 +84,5 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
