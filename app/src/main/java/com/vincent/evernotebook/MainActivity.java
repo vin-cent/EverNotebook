@@ -8,12 +8,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.evernote.client.android.EvernoteSession;
 
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!ensureLoggedIn()) {
+            finish();
+            return;
+        }
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -26,6 +35,17 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private boolean ensureLoggedIn() {
+        EvernoteSession session = EvernoteSession.getInstance();
+        boolean loggedIn = session.isLoggedIn();
+
+        if (!loggedIn) {
+            Toast.makeText(this, "Not logged in", Toast.LENGTH_LONG).show();
+        }
+
+        return loggedIn;
     }
 
     @Override
