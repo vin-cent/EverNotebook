@@ -6,23 +6,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.evernote.client.android.asyncclient.EvernoteCallback;
+import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
 import com.vincent.evernotebook.NotesListFragment.OnListFragmentInteractionListener;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * {@link RecyclerView.Adapter} that can display a note and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  */
-public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> {
+public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
+        implements EvernoteCallback<EvernoteSearchHelper.Result> {
 
-    private final List<NoteRef> mValues;
+    private List<NoteRef> mValues;
     private final OnListFragmentInteractionListener mListener;
+    private final EvernoteFacade mEvernoteFacade;
 
-    public NotesAdapter(List<NoteRef> items, OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public NotesAdapter(EvernoteFacade evernoteFacade, OnListFragmentInteractionListener listener) {
+        mEvernoteFacade = evernoteFacade;
         mListener = listener;
+        mValues = Collections.emptyList();
+        evernoteFacade.getNotes(this);
     }
 
     @Override
@@ -54,6 +61,17 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder> 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    @Override
+    public void onSuccess(EvernoteSearchHelper.Result result) {
+        mValues = result.getAllAsNoteRef();
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void onException(Exception exception) {
+
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

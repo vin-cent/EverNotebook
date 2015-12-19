@@ -17,14 +17,12 @@ import com.evernote.client.android.type.NoteRef;
 public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback,
                                                 NotesListFragment.OnListFragmentInteractionListener {
 
-    private EvernoteSession mSession;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if (!ensureLoggedIn()) {
-            mSession.authenticate(this);
+            EvernoteSession.getInstance().authenticate(this);
         } else {
             initUI();
         }
@@ -57,12 +55,11 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
 
     @Override
     public void onNoteClicked(NoteRef note) {
-
+        Toast.makeText(this, "Note clicked: " + note.getTitle(), Toast.LENGTH_LONG).show();
     }
 
     private boolean ensureLoggedIn() {
-        mSession = EvernoteSession.getInstance();
-        boolean loggedIn = mSession.isLoggedIn();
+        boolean loggedIn = EvernoteSession.getInstance().isLoggedIn();
 
         if (!loggedIn) {
             Toast.makeText(this, "Not logged in", Toast.LENGTH_LONG).show();

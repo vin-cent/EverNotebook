@@ -29,6 +29,8 @@ public class NotesListFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
 
+    private EvernoteFacade mEvernoteFacade;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -49,6 +51,9 @@ public class NotesListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        EvernoteApplication app = (EvernoteApplication) getContext().getApplicationContext();
+        mEvernoteFacade = app.getEvernoteFacade();
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -96,10 +101,7 @@ public class NotesListFragment extends Fragment {
     }
 
     public NotesAdapter getNotesAdapter() {
-        List<NoteRef> notes = new ArrayList<>();
-        NoteRef dummy = new NoteRef("noteGuid", "notebookGuid", "title", true);
-        notes.add(dummy);
-        return new NotesAdapter(notes, mListener);
+        return new NotesAdapter(mEvernoteFacade, mListener);
     }
 
     /**
