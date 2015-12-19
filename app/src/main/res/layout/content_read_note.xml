@@ -17,9 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        />
+        android:editable="false"
+        style="@style/TextAppearance.AppCompat.Title" />
 
-    <EditText
+    <WebView
         android:id="@+id/read_note_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

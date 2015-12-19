@@ -8,6 +8,7 @@ import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.EvernoteUtil;
 import com.evernote.client.android.asyncclient.EvernoteCallback;
 import com.evernote.client.android.asyncclient.EvernoteClientFactory;
+import com.evernote.client.android.asyncclient.EvernoteHtmlHelper;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
 import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
@@ -17,6 +18,7 @@ import com.evernote.edam.error.EDAMUserException;
 import com.evernote.edam.notestore.NoteList;
 import com.evernote.edam.type.Note;
 import com.evernote.thrift.TException;
+import com.squareup.okhttp.Response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +82,13 @@ public class EvernoteFacade {
 
     public Note getNoteContent(NoteRef noteRef) throws Exception {
         return noteRef.loadNote(true, false, false, false);
+    }
+
+    public String getNoteContentAsHtml(String guid) throws Exception {
+        EvernoteClientFactory clientFactory = EvernoteSession.getInstance().getEvernoteClientFactory();
+        EvernoteHtmlHelper htmlHelper = clientFactory.getHtmlHelperDefault();
+        Response response = htmlHelper.downloadNote(guid);
+        return htmlHelper.parseBody(response);
     }
 
     public Note getNoteContent(String guid) throws Exception {
