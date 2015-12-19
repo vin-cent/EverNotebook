@@ -11,8 +11,12 @@ import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
 import com.vincent.evernotebook.NotesListFragment.OnListFragmentInteractionListener;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import static com.vincent.evernotebook.Settings.SortOrder;
 
 /**
  * {@link RecyclerView.Adapter} that can display a note and makes a call to the
@@ -21,15 +25,43 @@ import java.util.List;
 public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
         implements EvernoteCallback<EvernoteSearchHelper.Result> {
 
+    private List<NoteRef> mNotesChronological;
     private List<NoteRef> mValues;
     private final OnListFragmentInteractionListener mListener;
     private final EvernoteFacade mEvernoteFacade;
+    private SortOrder mSortOrder;
 
-    public NotesAdapter(EvernoteFacade evernoteFacade, OnListFragmentInteractionListener listener) {
+
+    public NotesAdapter(SortOrder sortOrder, EvernoteFacade evernoteFacade, OnListFragmentInteractionListener listener) {
         mEvernoteFacade = evernoteFacade;
         mListener = listener;
         mValues = Collections.emptyList();
+        mSortOrder = sortOrder;
         evernoteFacade.getNotes(this);
+    }
+
+    public void setSortOrder(SortOrder sortOrder) {
+        this.mSortOrder = sortOrder;
+    }
+
+    public void orderNotes() {
+        // sort only when the data was loaded
+        if (mNotesChronological == null) {
+            return;
+        }
+
+        mValues = new ArrayList<>(mNotesChronological);
+
+        if (mSortOrder == SortOrder.Title) {
+            Collections.sort(mValues, new Comparator<NoteRef>() {
+                @Override
+                public int compare(NoteRef lhs, NoteRef rhs) {
+                    return lhs.getTitle().compareTo(rhs.getTitle());
+                }
+            });
+        }
+
+        notifyDataSetChanged();
     }
 
     @Override
@@ -64,8 +96,8 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
 
     @Override
     public void onSuccess(EvernoteSearchHelper.Result result) {
-        mValues = result.getAllAsNoteRef();
-        notifyDataSetChanged();
+        mNotesChronological = result.getAllAsNoteRef();
+        orderNotes();
     }
 
     @Override

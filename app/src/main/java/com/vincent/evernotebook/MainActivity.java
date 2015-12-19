@@ -14,8 +14,15 @@ import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
 
+import static com.vincent.evernotebook.Settings.SortOrder;
+
+
 public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback,
                                                 NotesListFragment.OnListFragmentInteractionListener {
+
+    private MenuItem mMenuSortTime;
+    private MenuItem mMenuSortTitle;
+    private NotesListFragment mNoteListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
 
     private void initUI() {
         setContentView(R.layout.activity_main);
+
+        mNoteListFragment = (NotesListFragment) getSupportFragmentManager().findFragmentById(R.id.main_notes_fragment);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -69,19 +79,48 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        mMenuSortTime = menu.findItem(R.id.menu_sort_by_time);
+        mMenuSortTitle = menu.findItem(R.id.menu_sort_by_title);
+
+        SortOrder sortOrder = Settings.getInstance(this).loadSortOrder();
+        switch (sortOrder) {
+            default:
+            case Chronological:
+                mMenuSortTime.setChecked(true);
+                break;
+            case Title:
+                mMenuSortTitle.setChecked(true);
+        }
         return true;
+    }
+
+    private void changeSortOrder(SortOrder sortOrder) {
+        mNoteListFragment.updateSorting(sortOrder);
+        Settings.getInstance(this).saveSortOrder(sortOrder);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        boolean check = !item.isChecked();
+
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (item == mMenuSortTime) {
+            item.setChecked(check);
+            changeSortOrder(SortOrder.Chronological);
             return true;
+        }
+
+        if (item == mMenuSortTitle) {
+            item.setChecked(check);
+            changeSortOrder(SortOrder.Title);
+            return true;
+        }
+
+        if (id == R.id.menu_sort_by_title) {
+
         }
 
         return super.onOptionsItemSelected(item);

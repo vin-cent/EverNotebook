@@ -30,6 +30,7 @@ public class NotesListFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
 
     private EvernoteFacade mEvernoteFacade;
+    private NotesAdapter mAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,6 +55,8 @@ public class NotesListFragment extends Fragment {
 
         EvernoteApplication app = (EvernoteApplication) getContext().getApplicationContext();
         mEvernoteFacade = app.getEvernoteFacade();
+        Settings.SortOrder order = Settings.getInstance(getContext()).loadSortOrder();
+        mAdapter = new NotesAdapter(order, mEvernoteFacade, mListener);
 
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
@@ -101,7 +104,12 @@ public class NotesListFragment extends Fragment {
     }
 
     public NotesAdapter getNotesAdapter() {
-        return new NotesAdapter(mEvernoteFacade, mListener);
+        return mAdapter;
+    }
+
+    public void updateSorting(Settings.SortOrder order) {
+        mAdapter.setSortOrder(order);
+        mAdapter.orderNotes();
     }
 
     /**
