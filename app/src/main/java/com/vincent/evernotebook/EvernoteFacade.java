@@ -7,6 +7,7 @@ import android.widget.Toast;
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.EvernoteUtil;
 import com.evernote.client.android.asyncclient.EvernoteCallback;
+import com.evernote.client.android.asyncclient.EvernoteClientFactory;
 import com.evernote.client.android.asyncclient.EvernoteNoteStoreClient;
 import com.evernote.client.android.asyncclient.EvernoteSearchHelper;
 import com.evernote.client.android.type.NoteRef;
@@ -79,6 +80,11 @@ public class EvernoteFacade {
 
     public Note getNoteContent(NoteRef noteRef) throws Exception {
         return noteRef.loadNote(true, false, false, false);
+    }
+
+    public Note getNoteContent(String guid) throws Exception {
+        EvernoteNoteStoreClient noteStoreClient = EvernoteSession.getInstance().getEvernoteClientFactory().getNoteStoreClient();
+        return noteStoreClient.getNote(guid, true, false, false, false);
     }
 
 }

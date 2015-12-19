@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
     @Override
     public void onNoteClicked(NoteRef note) {
         Toast.makeText(this, "Note clicked: " + note.getTitle(), Toast.LENGTH_LONG).show();
+        ReadNoteActivity.launch(this, note);
     }
 
     private boolean ensureLoggedIn() {
