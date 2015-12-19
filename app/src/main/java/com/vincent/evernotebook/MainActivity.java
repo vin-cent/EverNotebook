@@ -12,8 +12,10 @@ import android.widget.Toast;
 
 import com.evernote.client.android.EvernoteSession;
 import com.evernote.client.android.login.EvernoteLoginFragment;
+import com.evernote.client.android.type.NoteRef;
 
-public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback {
+public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback,
+                                                NotesListFragment.OnListFragmentInteractionListener {
 
     private EvernoteSession mSession;
 
@@ -50,6 +52,12 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
                         .setAction("Action", null).show();
             }
         });
+    }
+
+
+    @Override
+    public void onNoteClicked(NoteRef note) {
+
     }
 
     private boolean ensureLoggedIn() {
