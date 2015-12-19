@@ -29,7 +29,7 @@ public class EvernoteFacade {
     private static final String CONSUMER_SECRET = "Your consumer secret";
 
     private static final EvernoteSession.EvernoteService EVERNOTE_SERVICE = EvernoteSession.EvernoteService.SANDBOX;
-    private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = true;
+    private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = false;
 
     private EvernoteSession mSession;
     private final Context mContext;

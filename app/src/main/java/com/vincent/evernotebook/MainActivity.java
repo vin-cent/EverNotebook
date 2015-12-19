@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         if (successful) {
             initUI();
         } else {
+            Toast.makeText(this, "Logging in failed. Check your Internet connection.",
+                    Toast.LENGTH_LONG).show();
             finish();
         }
     }
@@ -60,13 +62,7 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
     }
 
     private boolean ensureLoggedIn() {
-        boolean loggedIn = EvernoteSession.getInstance().isLoggedIn();
-
-        if (!loggedIn) {
-            Toast.makeText(this, "Not logged in", Toast.LENGTH_LONG).show();
-        }
-
-        return loggedIn;
+        return EvernoteSession.getInstance().isLoggedIn();
     }
 
     @Override
