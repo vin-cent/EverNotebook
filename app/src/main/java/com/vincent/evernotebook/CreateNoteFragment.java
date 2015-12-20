@@ -3,8 +3,12 @@ package com.vincent.evernotebook;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -27,7 +31,12 @@ public class CreateNoteFragment extends Fragment {
 
     private EditText mTitleEditText;
     private EditText mContentEditText;
+    private TabLayout mTabs;
+    private ViewPager mViewPager;
+    private View editContentView;
+    private View drawContentView;
 
+    private String mContentText = "";
 
     public CreateNoteFragment() {
         // Required empty public constructor
@@ -56,14 +65,27 @@ public class CreateNoteFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_note, container, false);
 
         mTitleEditText = (EditText) view.findViewById(R.id.create_note_title);
-        mContentEditText = (EditText) view.findViewById(R.id.create_note_content);
+        mViewPager = (ViewPager) view.findViewById(R.id.create_note_pager);
+        initViewPager(mViewPager);
 
+        mTabs = (TabLayout) view.findViewById(R.id.create_note_tabs);
+        mTabs.setupWithViewPager(mViewPager);
         if (savedInstanceState != null) {
             mTitleEditText.setText(savedInstanceState.getString(KEY_TITLE));
-            mContentEditText.setText(savedInstanceState.getString(KEY_CONTENT));
+            mContentText = savedInstanceState.getString(KEY_CONTENT);
         }
 
         return view;
+    }
+
+    private void initViewPager(ViewPager mViewPager) {
+        mViewPager.setAdapter(new ViewPagerAdapter());
+        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
     }
 
     @Override
@@ -79,7 +101,11 @@ public class CreateNoteFragment extends Fragment {
     }
 
     public String getNoteContent() {
-        return mContentEditText.getText().toString();
+        if (mContentEditText != null) {
+            return mContentEditText.getText().toString();
+        } else {
+            return "";
+        }
     }
 
     public boolean validate() {
@@ -128,6 +154,49 @@ public class CreateNoteFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface CreateNoteFragmentListener {
-
     }
+
+
+    class ViewPagerAdapter extends PagerAdapter {
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            if (position == 0) {
+                editContentView = LayoutInflater.from(getContext()).inflate(R.layout.create_note_text, container, false);
+                mContentEditText = (EditText) editContentView.findViewById(R.id.create_note_content);
+                mContentEditText.setText(mContentText);
+                container.addView(editContentView);
+                return editContentView;
+            } else {
+                drawContentView = LayoutInflater.from(getContext()).inflate(R.layout.create_note_canvas, container, false);
+                container.addView(drawContentView);
+                return drawContentView;
+            }
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0) {
+                return "Text";
+            } else {
+                return "OCR";
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+    }
+
 }
