@@ -2,8 +2,6 @@ package com.vincent.evernotebook;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -13,8 +11,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.evernote.client.android.EvernoteSession;
+import com.evernote.client.android.asyncclient.EvernoteCallback;
 import com.evernote.client.android.login.EvernoteLoginFragment;
 import com.evernote.client.android.type.NoteRef;
+import com.evernote.edam.type.Note;
 
 import static com.vincent.evernotebook.Settings.SortOrder;
 
@@ -117,7 +117,19 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         String content = mCreateNoteFragment.getNoteContent();
 
         EvernoteApplication application = (EvernoteApplication) getApplication();
-        application.getEvernoteFacade().createNote(title, content);
+        application.getEvernoteFacade().createNote(title, content, new EvernoteCallback<Note>() {
+            @Override
+            public void onSuccess(Note result) {
+                mNoteListFragment.refreshNotes();
+                Toast.makeText(getApplicationContext(), result.getTitle() + " has been created", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onException(Exception exception) {
+                Toast.makeText(getApplicationContext(), "Error creating note", Toast.LENGTH_LONG).show();
+                exception.printStackTrace();
+            }
+        });
         finishNoteCreation();
     }
 

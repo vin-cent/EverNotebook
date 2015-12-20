@@ -55,7 +55,7 @@ public class EvernoteFacade {
         searchHelper.executeAsync(search, callback);
     }
 
-    public void createNote(String title, String content) {
+    public void createNote(String title, String content, EvernoteCallback<Note> callback) {
         if (!EvernoteSession.getInstance().isLoggedIn()) {
             return;
         }
@@ -63,21 +63,10 @@ public class EvernoteFacade {
         EvernoteNoteStoreClient noteStoreClient = EvernoteSession.getInstance().getEvernoteClientFactory().getNoteStoreClient();
 
         Note note = new Note();
-        note.setTitle("My title");
-        note.setContent(EvernoteUtil.NOTE_PREFIX + "My content" + EvernoteUtil.NOTE_SUFFIX);
+        note.setTitle(title);
+        note.setContent(EvernoteUtil.NOTE_PREFIX + content + EvernoteUtil.NOTE_SUFFIX);
 
-        noteStoreClient.createNoteAsync(note, new EvernoteCallback<Note>() {
-            @Override
-            public void onSuccess(Note result) {
-                Toast.makeText(mContext, result.getTitle() + " has been created", Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void onException(Exception exception) {
-                Toast.makeText(mContext, "Error creating note", Toast.LENGTH_LONG).show();
-                exception.printStackTrace();
-            }
-        });
+        noteStoreClient.createNoteAsync(note, callback);
     }
 
     public Note getNoteContent(NoteRef noteRef) throws Exception {

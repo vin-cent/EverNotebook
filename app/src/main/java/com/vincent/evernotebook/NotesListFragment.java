@@ -112,6 +112,10 @@ public class NotesListFragment extends Fragment {
         mAdapter.orderNotes();
     }
 
+    public void refreshNotes() {
+        mAdapter.requestUpdate();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

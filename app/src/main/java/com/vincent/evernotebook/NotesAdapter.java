@@ -100,6 +100,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
         orderNotes();
     }
 
+    public void requestUpdate() {
+        mEvernoteFacade.getNotes(this);
+    }
+
     @Override
     public void onException(Exception exception) {
 
