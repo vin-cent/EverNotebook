@@ -3,4 +3,9 @@
     <string name="menu_main_order_alpha">Order A-Z</string>
     <string name="menu_main_order_time">Order by time</string>
     <string name="title_activity_read_note">Note</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="create_note_title">Title</string>
+    <string name="create_note_content">Content</string>
 </resources>

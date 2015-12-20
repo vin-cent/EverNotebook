@@ -12,11 +12,22 @@
     tools:context="com.vincent.evernotebook.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <fragment
-        android:id="@+id/main_notes_fragment"
-        android:name="com.vincent.evernotebook.NotesListFragment"
+    <FrameLayout
+        android:id="@+id/main_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:elevation="2dp"
+        tools:ignore="UnusedAttribute">
+
+        <fragment
+            android:id="@+id/main_notes_fragment"
+            android:name="com.vincent.evernotebook.NotesListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
+
+
 </RelativeLayout>

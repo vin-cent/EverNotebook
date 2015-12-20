@@ -3,6 +3,7 @@ package com.vincent.evernotebook;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -18,11 +19,13 @@ import static com.vincent.evernotebook.Settings.SortOrder;
 
 
 public class MainActivity extends AppCompatActivity implements EvernoteLoginFragment.ResultCallback,
-                                                NotesListFragment.OnListFragmentInteractionListener {
+                                                NotesListFragment.OnListFragmentInteractionListener,
+                                                CreateNoteFragment.CreateNoteFragmentListener {
 
     private MenuItem mMenuSortTime;
     private MenuItem mMenuSortTitle;
     private NotesListFragment mNoteListFragment;
+    private CreateNoteFragment mCreateNoteFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +61,21 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showNoteCreator();
             }
         });
+    }
+
+    private void showNoteCreator() {
+        if (mCreateNoteFragment == null) {
+            mCreateNoteFragment = CreateNoteFragment.newInstance();
+        }
+
+        Toast.makeText(this, "clicked", Toast.LENGTH_LONG).show();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment_container, mCreateNoteFragment)
+                //.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .commit();
     }
 
 
@@ -119,11 +133,10 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
             return true;
         }
 
-        if (id == R.id.menu_sort_by_title) {
-
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
+    public void onCreateNote(String title, String content) {
+        Toast.makeText(this, "note " + title + ": " + content, Toast.LENGTH_LONG).show();
+    }
 }

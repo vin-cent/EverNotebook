@@ -1,0 +1,40 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    tools:context="com.vincent.evernotebook.CreateNoteFragment">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/create_note_title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        >
+
+        <EditText
+            android:id="@+id/create_note_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/create_note_title"
+            />
+    </android.support.design.widget.TextInputLayout>
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/create_note_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/create_note_title_layout"
+        >
+        <EditText
+            android:id="@+id/create_note_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top"
+            android:singleLine="false"
+            android:inputType="textMultiLine"
+            android:hint="@string/create_note_content"
+            />
+    </android.support.design.widget.TextInputLayout>
+</RelativeLayout>
