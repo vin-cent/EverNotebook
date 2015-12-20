@@ -60,6 +60,32 @@ public class CreateNoteFragment extends Fragment {
         return view;
     }
 
+    public String getNoteTitle() {
+        return mTitleEditText.getText().toString();
+    }
+
+    public String getNoteContent() {
+        return mContentEditText.getText().toString();
+    }
+
+    public boolean validate() {
+        if (getNoteTitle().isEmpty()) {
+            String msg = getString(R.string.create_note_title_missing);
+            mTitleEditText.setError(msg);
+            mTitleEditText.requestFocus();
+            return false;
+        }
+
+        if (getNoteContent().isEmpty()) {
+            String msg = getString(R.string.create_note_content_missing);
+            mContentEditText.setError(msg);
+            mContentEditText.requestFocus();
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.evernote.client.android.EvernoteSession;
@@ -61,9 +62,23 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showNoteCreator();
+                if (isCreatingNote()) {
+                    createNote();
+                } else {
+                    showNoteCreator();
+                }
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isCreatingNote()) {
+            finishNoteCreation();
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     private void showNoteCreator() {
@@ -73,9 +88,51 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
 
         Toast.makeText(this, "clicked", Toast.LENGTH_LONG).show();
         getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                                     android.R.anim.fade_in, android.R.anim.fade_out)
                 .replace(R.id.main_fragment_container, mCreateNoteFragment)
-                //.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private boolean isCreatingNote() {
+        return mCreateNoteFragment != null && mCreateNoteFragment.isVisible();
+    }
+
+    private void hideSoftInput() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+        View view = getCurrentFocus();
+
+        if (view != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private void createNote() {
+        if (!mCreateNoteFragment.validate()) {
+            return;
+        }
+
+        String title = mCreateNoteFragment.getNoteTitle();
+        String content = mCreateNoteFragment.getNoteContent();
+
+        EvernoteApplication application = (EvernoteApplication) getApplication();
+        application.getEvernoteFacade().createNote(title, content);
+        finishNoteCreation();
+    }
+
+    private void finishNoteCreation() {
+        hideSoftInput();
+
+        getSupportFragmentManager().beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                        android.R.anim.fade_in, android.R.anim.fade_out)
+                .remove(mCreateNoteFragment)
+                .commit();
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        }
     }
 
 
@@ -131,6 +188,10 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
             item.setChecked(check);
             changeSortOrder(SortOrder.Title);
             return true;
+        }
+
+        if (id == android.R.id.home) {
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);
