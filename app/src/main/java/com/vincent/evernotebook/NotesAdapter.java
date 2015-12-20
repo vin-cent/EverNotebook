@@ -26,7 +26,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
         implements EvernoteCallback<EvernoteSearchHelper.Result> {
 
     private List<NoteRef> mNotesChronological;
-    private List<NoteRef> mValues;
+    private List<NoteRef> mNotes;
     private final OnListFragmentInteractionListener mListener;
     private final EvernoteFacade mEvernoteFacade;
     private SortOrder mSortOrder;
@@ -35,9 +35,12 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
     public NotesAdapter(SortOrder sortOrder, EvernoteFacade evernoteFacade, OnListFragmentInteractionListener listener) {
         mEvernoteFacade = evernoteFacade;
         mListener = listener;
-        mValues = Collections.emptyList();
+        mNotes = Collections.emptyList();
         mSortOrder = sortOrder;
-        evernoteFacade.getNotes(this);
+    }
+
+    public List<NoteRef> getNotes() {
+        return mNotes;
     }
 
     public void setSortOrder(SortOrder sortOrder) {
@@ -50,10 +53,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
             return;
         }
 
-        mValues = new ArrayList<>(mNotesChronological);
+        mNotes = new ArrayList<>(mNotesChronological);
 
         if (mSortOrder == SortOrder.Title) {
-            Collections.sort(mValues, new Comparator<NoteRef>() {
+            Collections.sort(mNotes, new Comparator<NoteRef>() {
                 @Override
                 public int compare(NoteRef lhs, NoteRef rhs) {
                     return lhs.getTitle().compareTo(rhs.getTitle());
@@ -73,7 +76,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        NoteRef note = mValues.get(position);
+        NoteRef note = mNotes.get(position);
         holder.mItem = note;
         holder.mTitleView.setText(note.getTitle());
 
@@ -91,7 +94,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return mNotes.size();
     }
 
     @Override
@@ -100,7 +103,11 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.ViewHolder>
         orderNotes();
     }
 
-    public void requestUpdate() {
+    public void setNotes(List<NoteRef> notes) {
+        this.mNotes = notes;
+    }
+
+    public void requestNotes() {
         mEvernoteFacade.getNotes(this);
     }
 

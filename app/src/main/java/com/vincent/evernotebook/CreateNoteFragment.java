@@ -20,6 +20,8 @@ import android.widget.EditText;
  */
 public class CreateNoteFragment extends Fragment {
 
+    private static final String KEY_TITLE = "edit-title";
+    private static final String KEY_CONTENT = "edit-content";
 
     private CreateNoteFragmentListener mListener;
 
@@ -37,7 +39,6 @@ public class CreateNoteFragment extends Fragment {
      *
      * @return A new instance of fragment CreateNoteFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static CreateNoteFragment newInstance() {
         CreateNoteFragment fragment = new CreateNoteFragment();
         return fragment;
@@ -57,7 +58,20 @@ public class CreateNoteFragment extends Fragment {
         mTitleEditText = (EditText) view.findViewById(R.id.create_note_title);
         mContentEditText = (EditText) view.findViewById(R.id.create_note_content);
 
+        if (savedInstanceState != null) {
+            mTitleEditText.setText(savedInstanceState.getString(KEY_TITLE));
+            mContentEditText.setText(savedInstanceState.getString(KEY_CONTENT));
+        }
+
         return view;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(KEY_TITLE, getNoteTitle());
+        outState.putString(KEY_CONTENT, getNoteContent());
     }
 
     public String getNoteTitle() {

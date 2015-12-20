@@ -2,6 +2,7 @@ package com.vincent.evernotebook;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -23,6 +24,9 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
                                                 NotesListFragment.OnListFragmentInteractionListener,
                                                 CreateNoteFragment.CreateNoteFragmentListener {
 
+    public static final String TAG_NOTES = "notes";
+    public static final String TAG_CREATE_NOTE = "create-note";
+
     private MenuItem mMenuSortTime;
     private MenuItem mMenuSortTitle;
     private NotesListFragment mNoteListFragment;
@@ -37,6 +41,15 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
             EvernoteSession.getInstance().authenticate(this);
         } else {
             initUI();
+
+            if (savedInstanceState != null) {
+                FragmentManager fm = getSupportFragmentManager();
+                mCreateNoteFragment = (CreateNoteFragment) fm.findFragmentByTag(TAG_CREATE_NOTE);
+                mNoteListFragment = (NotesListFragment) fm.findFragmentByTag(TAG_NOTES);
+                updateGoBackNavigation();
+            } else {
+                showNotesList();
+            }
         }
     }
 
@@ -53,8 +66,6 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
 
     private void initUI() {
         setContentView(R.layout.activity_main);
-
-        mNoteListFragment = (NotesListFragment) getSupportFragmentManager().findFragmentById(R.id.main_notes_fragment);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -83,23 +94,39 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
     }
 
     private void showNoteCreator() {
+        FragmentManager fm = getSupportFragmentManager();
+
         if (mCreateNoteFragment == null) {
             mCreateNoteFragment = CreateNoteFragment.newInstance();
         }
 
         mFab.setImageResource(R.drawable.ic_done_white);
 
-        Toast.makeText(this, "clicked", Toast.LENGTH_LONG).show();
-        getSupportFragmentManager().beginTransaction()
+        fm.beginTransaction()
                 .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
                                      android.R.anim.fade_in, android.R.anim.fade_out)
-                .replace(R.id.main_fragment_container, mCreateNoteFragment)
+                .replace(R.id.main_fragment_container, mCreateNoteFragment, TAG_CREATE_NOTE)
                 .commit();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        fm.executePendingTransactions();
+
+        updateGoBackNavigation();
+    }
+
+    private void updateGoBackNavigation() {
+        boolean canGoBack = false;
+
+        if (isCreatingNote()) {
+            canGoBack = true;
+        }
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canGoBack);
+        }
     }
 
     private boolean isCreatingNote() {
-        return mCreateNoteFragment != null && mCreateNoteFragment.isVisible();
+        return mCreateNoteFragment != null
+                && mCreateNoteFragment.isAdded();
     }
 
     private void hideSoftInput() {
@@ -138,12 +165,7 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
 
     private void finishNoteCreation() {
         hideSoftInput();
-
-        getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
-                        android.R.anim.fade_in, android.R.anim.fade_out)
-                .remove(mCreateNoteFragment)
-                .commit();
+        showNotesList();
 
         mFab.setImageResource(R.drawable.ic_create_white);
 
@@ -152,10 +174,23 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         }
     }
 
+    private void showNotesList() {
+        FragmentManager fm = getSupportFragmentManager();
+
+        if (mNoteListFragment == null) {
+            mNoteListFragment = NotesListFragment.newInstance();
+        }
+
+        fm.beginTransaction()
+                .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out,
+                        android.R.anim.fade_in, android.R.anim.fade_out)
+                .replace(R.id.main_fragment_container, mNoteListFragment, TAG_NOTES)
+                .commit();
+    }
+
 
     @Override
     public void onNoteClicked(NoteRef note) {
-        Toast.makeText(this, "Note clicked: " + note.getTitle(), Toast.LENGTH_LONG).show();
         ReadNoteActivity.launch(this, note);
     }
 
@@ -212,9 +247,5 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onCreateNote(String title, String content) {
-        Toast.makeText(this, "note " + title + ": " + content, Toast.LENGTH_LONG).show();
     }
 }

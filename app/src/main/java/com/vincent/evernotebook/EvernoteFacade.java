@@ -32,12 +32,9 @@ public class EvernoteFacade {
     private static final boolean SUPPORT_APP_LINKED_NOTEBOOKS = false;
 
     private EvernoteSession mSession;
-    private final Context mContext;
 
 
     public EvernoteFacade(Context applicationContext) {
-        mContext = applicationContext;
-
         String consumerSecret = BuildConfig.EVERNOTE_CONSUMER_SECRET;
         String consumerKey = BuildConfig.EVERNOTE_CONSUMER_KEY;
 

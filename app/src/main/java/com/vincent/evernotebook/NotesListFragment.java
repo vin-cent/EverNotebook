@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.evernote.client.android.type.NoteRef;
+import com.evernote.edam.type.Note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,8 @@ import java.util.List;
  */
 public class NotesListFragment extends Fragment {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
+    private static final int COLUMN_COUNT = 1;
+    public static final String KEY_NOTES = "notes";
     private OnListFragmentInteractionListener mListener;
 
     private EvernoteFacade mEvernoteFacade;
@@ -39,12 +38,10 @@ public class NotesListFragment extends Fragment {
     public NotesListFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
-    public static NotesListFragment newInstance(int columnCount) {
+    public static NotesListFragment newInstance() {
         NotesListFragment fragment = new NotesListFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,8 +55,30 @@ public class NotesListFragment extends Fragment {
         Settings.SortOrder order = Settings.getInstance(getContext()).loadSortOrder();
         mAdapter = new NotesAdapter(order, mEvernoteFacade, mListener);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+        boolean requestNotes = true;
+
+        if (savedInstanceState != null) {
+            List<NoteRef> notes = (ArrayList) savedInstanceState.getParcelableArrayList(KEY_NOTES);
+
+            if (notes != null) {
+                mAdapter.setNotes(notes);
+                requestNotes = false;
+            }
+        }
+
+        if (requestNotes) {
+            mAdapter.requestNotes();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        List<NoteRef> notes = mAdapter.getNotes();
+
+        if (notes != null && !notes.isEmpty()) {
+            outState.putParcelableArrayList(KEY_NOTES, (ArrayList<NoteRef>) notes);
         }
     }
 
@@ -72,10 +91,11 @@ public class NotesListFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
+
+            if (COLUMN_COUNT <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                recyclerView.setLayoutManager(new GridLayoutManager(context, COLUMN_COUNT));
             }
 
 
@@ -113,7 +133,7 @@ public class NotesListFragment extends Fragment {
     }
 
     public void refreshNotes() {
-        mAdapter.requestUpdate();
+        mAdapter.requestNotes();
     }
 
     /**
