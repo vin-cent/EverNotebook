@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
     private MenuItem mMenuSortTitle;
     private NotesListFragment mNoteListFragment;
     private CreateNoteFragment mCreateNoteFragment;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +59,8 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (isCreatingNote()) {
@@ -85,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
         if (mCreateNoteFragment == null) {
             mCreateNoteFragment = CreateNoteFragment.newInstance();
         }
+
+        mFab.setImageResource(R.drawable.ic_done_white);
 
         Toast.makeText(this, "clicked", Toast.LENGTH_LONG).show();
         getSupportFragmentManager().beginTransaction()
@@ -141,6 +144,8 @@ public class MainActivity extends AppCompatActivity implements EvernoteLoginFrag
                         android.R.anim.fade_in, android.R.anim.fade_out)
                 .remove(mCreateNoteFragment)
                 .commit();
+
+        mFab.setImageResource(R.drawable.ic_create_white);
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
